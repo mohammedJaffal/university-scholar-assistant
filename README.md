@@ -249,6 +249,4 @@ The Spring Boot backend configuration is in `src/main/resources/application.prop
 - Do not commit your OpenRouter API key to version control - consider using environment variables instead "# university-scholar-assistant" 
 "# university-scholar-assistant" 
 "# university-scholar-assistant" 
-#   u n i v e r s i t y - s c h o l a r - a s s i s t a n t  
- #   u n i v e r s i t y - s c h o l a r - a s s i s t a n t  
- 
+#
