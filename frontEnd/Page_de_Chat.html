@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat FSBM - Sapiora Welcome v2</title>
+    <link href="./dist/style.css" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles for better chat experience */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 16px;
+            background: #f3f4f6;
+            border-radius: 16px;
+            max-width: 80%;
+            margin-bottom: 16px;
+        }
+        
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #6b7280;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+        
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.4;
+            }
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
+        }
+        
+        .source-item {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin: 4px 0;
+            border-left: 3px solid #3b82f6;
+            font-size: 0.875rem;
+        }
+        
+        .sources-container {
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .message-content {
+            line-height: 1.6;
+        }
+        
+        .message-content h2,
+        .message-content h3 {
+            margin: 16px 0 8px 0;
+            font-weight: 600;
+        }
+        
+        .message-content p {
+            margin: 8px 0;
+        }
+        
+        .message-content ul,
+        .message-content ol {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+        
+        .send-button-disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        
+        .send-button-sending {
+            opacity: 0.7;
+            cursor: wait;
+        }
+        
+        /* Sidebar styles */
+        #sidebar {
+            width: 260px;
+            transition: width 0.3s ease;
+        }
+        
+        #sidebar.w-16 {
+            width: 64px;
+        }
+        
+        #sidebar.w-64 {
+            width: 260px;
+        }
+        
+        /* Mobile sidebar */
+        @media (max-width: 768px) {
+            #sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100%;
+                width: 260px !important;
+                z-index: 30;
+                transition: transform 0.3s ease;
+            }
+            
+            #sidebar.w-16 {
+                width: 260px !important;
+            }
+            
+            #historySection {
+                transition: max-height 0.3s ease, opacity 0.3s ease;
+            }
+        }
+        
+        /* Conversation history item styles */
+        .conversation-item {
+            position: relative;
+        }
+        
+        .conversation-item .delete-button {
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        
+        .conversation-item:hover .delete-button {
+            opacity: 1;
+        }
+    </style></head>
+
+<body class="flex h-screen overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="bg-gemini-sidebar-bg h-full flex flex-col flex-shrink-0 print:hidden border-r border-gray-300 fixed md:static z-30 transition-all duration-300 ease-in-out shadow-lg md:shadow-none w-64 md:translate-x-0 -translate-x-full md:w-64">
+        <div class="p-3 h-[60px] flex items-center justify-between flex-shrink-0 " id="sidebarHeader">
+            <button id="sidebarToggleBtn" class="p-2 text-gray-500 hover:text-chat-interactive hover:bg-gray-100 rounded-full focus:outline-none" aria-label="Ouvrir/Fermer le menu">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
+            
+            <button id="mobileSidebarCloseBtn" class="md:hidden p-2 text-gray-500 hover:text-chat-interactive hover:bg-gray-100 rounded-full">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        <div id="sidebarContentWrapper" class="flex flex-col flex-grow overflow-hidden pt-2">
+            <div class="px-3 mb-3">
+                <button id="newChatBtn" class="w-full flex items-center justify-start bg-chat-interactive text-white py-2.5 px-4 rounded-full font-medium hover:bg-chat-interactive-hover transition duration-150">
+                    <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                    <span class="sidebar-text">Nouvelle Conversation</span>
+                </button>
+            </div>
+            <div class="px-3 mt-2">
+                <button id="historyToggleBtn" class="w-full flex items-center justify-between text-sm font-medium text-gray-600 hover:text-gray-900 py-2 px-2 rounded-md hover:bg-gray-100 focus:outline-none" aria-expanded="true">
+                    <span class="sidebar-text">Historique</span>
+                    <svg id="historyArrowIcon" class="w-5 h-5 transform transition-transform duration-200" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                </button>
+            </div>
+            <div id="historySection" class="flex-grow overflow-hidden mt-1">
+                <div class="px-3 pb-2" id="searchConversationsContainer">
+                    <div class="relative">
+                        <input type="text" id="searchConversations" placeholder="Rechercher historique..." class="w-full pl-10 pr-4 py-2 bg-gray-100 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-1 focus:ring-chat-interactive focus:border-chat-interactive">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path></svg>
+                        </div>
+                    </div>
+                </div>
+                <nav id="conversationHistoryList" class="overflow-y-auto custom-scrollbar px-2 space-y-1" style="max-height: calc(100vh - 320px);"></nav>
+            </div>
+            <div class="p-3 border-t border-gray-200 mt-auto flex-shrink-0">
+                <div id="userProfileContainer" class="flex items-center group relative test-pointer p-2 rounded-md hover:bg-gray-100">
+                    <img class="h-8 w-8 rounded-full object-cover flex-shrink-0" src="téléchargement (1).png" alt="User Avatar" id="userAvatar">
+                    <div id="userInfo" class="ml-3 flex-1 min-w-0 sidebar-text">
+                        <p class="text-sm font-medium text-gray-800 truncate" id="userNameDisplay">Utilisateur</p>
+                    </div>
+                    <button id="userAccountBtn" aria-label="Options du compte" class="p-1 text-gray-500 hover:text-gray-700 rounded-full">
+                        <svg class="w-5 h-5 sidebar-text" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 6a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4z" clip-rule="evenodd"></path></svg>
+                    </button>
+                    <div id="userAccountDropdown" class="hidden absolute bottom-full right-0 mb-2 w-60 bg-white rounded-lg shadow-xl ring-1 ring-black ring-opacity-5 py-1 z-40">
+                        <a href="#" id="accountSettingsLink" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">Paramètres du compte</a>
+                        <div class="border-t border-gray-100 my-1"></div>
+                        <a href="./index.html" id="logoutChatBtn" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700">Déconnexion</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Chat Area -->
+    <div id="mainChatArea" class="flex-1 flex flex-col overflow-hidden bg-gemini-sidebar-bg transition-colors duration-300 ease-in-out">
+        <header class="p-3 flex items-center justify-between flex-shrink-0 bg-white/80 backdrop-blur-md h-[60px] sticky top-0 z-10">
+            <button id="mainAreaMobileSidebarToggleBtn" class="md:hidden p-2 text-gray-500 hover:text-chat-interactive rounded-full hover:bg-gray-100" aria-label="Ouvrir le menu">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
+           
+        </header>
+
+        <main id="messageDisplayArea" class="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 md:p-8 flex flex-col bg-transparent">
+            <div class="max-w-3xl w-full mx-auto flex flex-col flex-grow items-stretch">
+                <div id="welcomeMessageContainer" class="flex flex-col justify-center items-center flex-grow text-center p-4">
+                    <h1 class="text-4xl font-bold text-gemini-text-primary mb-3">Hi, I'm Your smart Assistant .</h1>
+                    <p class="text-xl text-gemini-text-primary">Comment puis-je vous aider ?</p>
+                </div>
+                <div id="messagesContainer" class="flex flex-col space-y-4">
+                    <!-- Messages will be added here -->
+                </div>
+                <div id="typingIndicatorContainer" class="w-full mt-auto flex-shrink-0">
+                    <!-- Typing indicator will be added here by JS -->
+                </div>
+            </div>
+        </main>
+
+        <footer class="py-3 px-4 sm:py-4 sm:px-6 md:px-8 bg-gemini-sidebar-bg flex-shrink-0">
+            <div class="max-w-3xl w-full mx-auto">
+                <div class="flex items-end space-x-2 p-1 bg-gemini-input-bg rounded-2xl shadow-lg border border-gemini-input-border">
+                    <button id="uploadFileBtnFooter" type="button" class="flex-shrink-0 p-2.5 text-gray-500 hover:text-chat-interactive rounded-full hover:bg-gray-100 focus:outline-none" aria-label="Télécharger un fichier">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+                    </button>
+                    <input type="file" id="fileInputFooter" class="hidden" accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg">
+                    <textarea id="messageInputFooter" rows="1" placeholder="Posez une question à Chat FSBM..." class="flex-grow py-2.5 px-3 resize-none border-none focus:ring-0 bg-transparent text-sm custom-scrollbar placeholder-gray-500" style="max-height: 120px; overflow-y: auto;"></textarea>
+                    <button id="sendMsgBtnFooter" type="button" class="flex-shrink-0 bg-chat-interactive text-white rounded-xl p-2.5 hover:bg-chat-interactive-hover focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-chat-interactive transition duration-150" aria-label="Envoyer le message">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"> <path d="M3.105 3.106a.75.75 0 01.884-.058l14.25 8.25a.75.75 0 010 1.308l-14.25 8.25a.75.75 0 01-.884-.058.75.75 0 01-.218-.932L5.019 12 2.887 4.038a.75.75 0 01.218-.932z"></path></svg>
+                    </button>
+                </div>
+            </div>
+         </footer>
+    </div>
+
+    <div id="mobileSidebarOverlay" class="fixed inset-0 bg-black/30 z-20 hidden md:hidden"></div>
+    <script type="module">
+        // API configuration
+        const API_URL = 'http://localhost:8000/chat';
+        
+        // Chat state
+        let messages = [];
+        let currentFilters = {};
+        let isTyping = false;
+        
+        // DOM Elements
+        const messageInput = document.getElementById('messageInputFooter');
+        const sendButton = document.getElementById('sendMsgBtnFooter');
+        const messageDisplayArea = document.getElementById('messageDisplayArea');
+        const messagesContainer = document.getElementById('messagesContainer');
+        const welcomeMessageContainer = document.getElementById('welcomeMessageContainer');
+        const typingIndicatorContainer = document.getElementById('typingIndicatorContainer');
+        
+        // Function to show typing indicator
+        function showTypingIndicator() {
+            if (isTyping) return;
+            isTyping = true;
+            
+            const typingDiv = document.createElement('div');
+            typingDiv.id = 'typingIndicator';
+            typingDiv.className = 'flex justify-start mb-4';
+            typingDiv.innerHTML = `
+                <div class="typing-indicator">
+                    <div class="typing-dots">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                    <span class="text-sm text-gray-600">Sapiora réfléchit...</span>
+                </div>
+            `;
+            
+            messagesContainer.appendChild(typingDiv);
+            scrollToBottom();
+        }
+        
+        // Function to hide typing indicator
+        function hideTypingIndicator() {
+            isTyping = false;
+            const typingIndicator = document.getElementById('typingIndicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+        
+        // Function to scroll to bottom
+        function scrollToBottom() {
+            messageDisplayArea.scrollTop = messageDisplayArea.scrollHeight;
+        }
+        
+        // Function to update send button state
+        function updateSendButtonState() {
+            const message = messageInput.value.trim();
+            const isEmpty = !message;
+            
+            sendButton.disabled = isEmpty || isTyping;
+            
+            // Remove all state classes first
+            sendButton.classList.remove('send-button-disabled', 'send-button-sending');
+            
+            if (isTyping) {
+                sendButton.classList.add('send-button-sending');
+            } else if (isEmpty) {
+                sendButton.classList.add('send-button-disabled');
+            }
+        }
+        
+        // Function to format message content
+        function formatMessageContent(content) {
+            // Convert markdown headings to HTML
+            content = content.replace(/^###\s*(.*)$/gm, '<h3 class="text-lg font-semibold mb-2 mt-4">$1</h3>');
+            content = content.replace(/^##\s*(.*)$/gm, '<h2 class="text-xl font-semibold mb-2 mt-4">$1</h2>');
+            
+            // Convert **bold** to HTML
+            content = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            
+            // Convert markdown links to HTML
+            content = content.replace(
+                /\[([^\]]+)\]\(([^)]+)\)/g,
+                '<a href="$2" target="_blank" class="text-blue-500 hover:underline">$1</a>'
+            );
+            
+            // Convert line breaks to paragraphs
+            const paragraphs = content.split('\n\n').filter(p => p.trim());
+            content = paragraphs.map(p => {
+                if (p.startsWith('<h') || p.includes('<ul>') || p.includes('<ol>')) {
+                    return p;
+                }
+                return `<p class="mb-2">${p.replace(/\n/g, '<br>')}</p>`;
+            }).join('');
+            
+            return content;
+        }
+        
+        // Function to format sources
+        function formatSources(sources) {
+            if (!sources || sources.length === 0) return '';
+            
+            const sourceItems = sources.map(source => {
+                const sourceName = source.trim();
+                return `<div class="source-item">${sourceName}</div>`;
+            }).join('');
+            
+            return `
+                <div class="sources-container">
+                    <h4 class="text-sm font-semibold text-white/90 mb-2">📚 Sources :</h4>
+                    ${sourceItems}
+                </div>
+            `;
+        }
+        
+        // Function to add a message to the chat
+        function addMessage(content, isUser = false, sources = []) {
+            // Hide welcome message if it's the first message
+            if (welcomeMessageContainer && welcomeMessageContainer.style.display !== 'none') {
+                welcomeMessageContainer.style.display = 'none';
+            }
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`;
+            
+            const messageBubble = document.createElement('div');
+            messageBubble.className = `max-w-[85%] rounded-lg p-4 ${
+                isUser 
+                    ? 'bg-chat-interactive text-white' 
+                    : 'bg-gray-100 text-gray-800'
+            }`;
+            
+            // Format the main content
+            const formattedContent = isUser ? content : formatMessageContent(content);
+            
+            const mainContentElement = document.createElement('div');
+            mainContentElement.className = 'message-content';
+            mainContentElement.innerHTML = formattedContent;
+            messageBubble.appendChild(mainContentElement);
+            
+            // Add sources for assistant messages
+            if (!isUser && sources && sources.length > 0) {
+                const sourcesHTML = formatSources(sources);
+                const sourcesElement = document.createElement('div');
+                sourcesElement.innerHTML = sourcesHTML;
+                messageBubble.appendChild(sourcesElement);
+            }
+            
+            messageDiv.appendChild(messageBubble);
+            messagesContainer.appendChild(messageDiv);
+            scrollToBottom();
+        }
+        
+        // Function to send message to API
+        async function sendMessage(message) {
+            try {
+                // Create new conversation if this is first message and no conversation exists
+                if (messages.length === 0 && !currentConversationId) {
+                    currentConversationId = generateConversationId();
+                }
+                
+                // Add user message immediately
+                addMessage(message, true);
+                
+                // Clear input and update button state
+                messageInput.value = '';
+                messageInput.disabled = true;
+                updateSendButtonState();
+                
+                // Show typing indicator
+                showTypingIndicator();
+                
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        conversation_id: currentConversationId,
+                        similarity_threshold: 0.35,
+                        max_docs: 5,
+                        filters: currentFilters
+                    }),
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Hide typing indicator
+                hideTypingIndicator();
+                
+                // Add bot response
+                let botResponseContent = data.response || "Désolé, je n'ai pas pu traiter votre demande.";
+                let botSources = data.sources || [];
+                
+                addMessage(botResponseContent, false, botSources);
+                
+                // Ensure conversation is saved to storage
+                saveConversationsToStorage();
+                
+            } catch (error) {
+                console.error('Error:', error);
+                hideTypingIndicator();
+                addMessage('Désolé, une erreur est survenue lors du traitement de votre message. Veuillez réessayer.', false);
+                
+                // Ensure conversation is saved even on error
+                saveConversationsToStorage();
+            } finally {
+                // Re-enable input and update button state
+                messageInput.disabled = false;
+                updateSendButtonState();
+                messageInput.focus();
+            }
+        }
+        
+        // Event Listeners
+        messageInput.addEventListener('input', updateSendButtonState);
+        
+        // Auto-resize textarea
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+        
+        sendButton.addEventListener('click', () => {
+            const message = messageInput.value.trim();
+            if (message && !isTyping) {
+                sendMessage(message);
+            }
+        });
+        
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                const message = messageInput.value.trim();
+                if (message && !isTyping) {
+                    sendMessage(message);
+                }
+            }
+        });
+        
+        // Handle file upload
+        const fileInput = document.getElementById('fileInputFooter');
+        const uploadButton = document.getElementById('uploadFileBtnFooter');
+        
+        uploadButton.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                addMessage(`Fichier "${file.name}" sélectionné. La fonctionnalité d'upload sera bientôt disponible.`, false);
+            }
+        });
+
+        // Initialize
+        updateSendButtonState();
+        messageInput.focus();
+        
+        // Sidebar functionality
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+        const mobileSidebarToggleBtn = document.getElementById('mainAreaMobileSidebarToggleBtn');
+        const mobileSidebarCloseBtn = document.getElementById('mobileSidebarCloseBtn');
+        const mobileSidebarOverlay = document.getElementById('mobileSidebarOverlay');
+        const historyToggleBtn = document.getElementById('historyToggleBtn');
+        const historySection = document.getElementById('historySection');
+        const historyArrowIcon = document.getElementById('historyArrowIcon');
+        const userProfileContainer = document.getElementById('userProfileContainer');
+        const userAccountBtn = document.getElementById('userAccountBtn');
+        const userAccountDropdown = document.getElementById('userAccountDropdown');
+        
+        // Toggle sidebar on desktop
+        sidebarToggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('w-64');
+            sidebar.classList.toggle('w-16');
+            
+            // Toggle visibility of text elements in sidebar
+            const sidebarTextElements = document.querySelectorAll('.sidebar-text');
+            sidebarTextElements.forEach(el => {
+                el.classList.toggle('hidden');
+            });
+        });
+        
+        // Toggle sidebar on mobile
+        mobileSidebarToggleBtn.addEventListener('click', () => {
+            sidebar.classList.remove('-translate-x-full');
+            mobileSidebarOverlay.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+        });
+        
+        // Close sidebar on mobile
+        mobileSidebarCloseBtn.addEventListener('click', () => {
+            sidebar.classList.add('-translate-x-full');
+            mobileSidebarOverlay.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        });
+        
+        // Close sidebar when clicking overlay
+        mobileSidebarOverlay.addEventListener('click', () => {
+            sidebar.classList.add('-translate-x-full');
+            mobileSidebarOverlay.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        });
+        
+        // Toggle history section
+        let historyExpanded = true;
+        historyToggleBtn.addEventListener('click', () => {
+            historyExpanded = !historyExpanded;
+            
+            if (historyExpanded) {
+                historySection.style.maxHeight = 'calc(100vh - 320px)';
+                historySection.style.opacity = '1';
+                historyArrowIcon.classList.remove('rotate-180');
+            } else {
+                historySection.style.maxHeight = '0';
+                historySection.style.opacity = '0';
+                historyArrowIcon.classList.add('rotate-180');
+            }
+        });
+        
+        // User profile dropdown
+        userAccountBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userAccountDropdown.classList.toggle('hidden');
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!userProfileContainer.contains(e.target)) {
+                userAccountDropdown.classList.add('hidden');
+            }
+        });
+        
+        // Conversation management
+        let conversations = [];
+        let currentConversationId = null;
+        
+        // Load conversations from local storage
+        function loadConversationsFromStorage() {
+            try {
+                const savedConversations = localStorage.getItem('chatFSBM_conversations');
+                if (savedConversations) {
+                    conversations = JSON.parse(savedConversations);
+                    // Convert string dates back to Date objects
+                    conversations.forEach(conv => {
+                        conv.timestamp = new Date(conv.timestamp);
+                        conv.messages.forEach(msg => {
+                            msg.timestamp = new Date(msg.timestamp);
+                        });
+                    });
+                }
+                
+                const savedCurrentId = localStorage.getItem('chatFSBM_currentConversationId');
+                if (savedCurrentId) {
+                    currentConversationId = savedCurrentId;
+                }
+            } catch (error) {
+                console.error('Error loading conversations from storage:', error);
+                conversations = [];
+                currentConversationId = null;
+            }
+        }
+        
+        // Save conversations to local storage
+        function saveConversationsToStorage() {
+            try {
+                localStorage.setItem('chatFSBM_conversations', JSON.stringify(conversations));
+                localStorage.setItem('chatFSBM_currentConversationId', currentConversationId || '');
+            } catch (error) {
+                console.error('Error saving conversations to storage:', error);
+            }
+        }
+        
+        // Generate a unique ID for conversations
+        function generateConversationId() {
+            return Date.now().toString(36) + Math.random().toString(36).substring(2);
+        }
+        
+        // Create a new conversation
+        function createNewConversation() {
+            // Save current conversation if it exists
+            if (currentConversationId && messages.length > 0) {
+                const existingConversationIndex = conversations.findIndex(c => c.id === currentConversationId);
+                if (existingConversationIndex >= 0) {
+                    // Update existing conversation
+                    conversations[existingConversationIndex].messages = [...messages];
+                    // Update timestamp to keep it at the top of the list
+                    conversations[existingConversationIndex].timestamp = new Date();
+                } else {
+                    // This should rarely happen as conversations should be added when first message is sent
+                    const timestamp = new Date();
+                    const firstUserMessage = messages.find(m => m.isUser)?.content || "Nouvelle conversation";
+                    const title = firstUserMessage.length > 30 ? firstUserMessage.substring(0, 30) + "..." : firstUserMessage;
+                    
+                    conversations.push({
+                        id: currentConversationId,
+                        title: title,
+                        timestamp: timestamp,
+                        messages: [...messages]
+                    });
+                }
+                
+                // Save to local storage
+                saveConversationsToStorage();
+            }
+            
+            // Create new conversation
+            currentConversationId = generateConversationId();
+            messages = [];
+            
+            // Clear UI
+            messagesContainer.innerHTML = '';
+            welcomeMessageContainer.style.display = 'flex';
+            
+            // Update conversation history UI
+            updateConversationHistory();
+            
+            // Update title
+            document.getElementById('currentChatTitleHeader').textContent = "Nouvelle conversation";
+            
+            // Save to local storage
+            saveConversationsToStorage();
+        }
+        
+        // Update conversation history in sidebar
+        function updateConversationHistory(searchTerm = '') {
+            const historyList = document.getElementById('conversationHistoryList');
+            historyList.innerHTML = '';
+            
+            // Sort conversations by timestamp (newest first)
+            const sortedConversations = [...conversations].sort((a, b) => 
+                new Date(b.timestamp) - new Date(a.timestamp)
+            );
+            
+            // Filter by search term if provided
+            const filteredConversations = searchTerm 
+                ? sortedConversations.filter(conv => 
+                    conv.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    conv.messages.some(msg => 
+                        msg.content.toLowerCase().includes(searchTerm.toLowerCase())
+                    )
+                )
+                : sortedConversations;
+            
+            if (filteredConversations.length === 0) {
+                const noResultsElement = document.createElement('div');
+                noResultsElement.className = 'text-center py-3 text-sm text-gray-500';
+                noResultsElement.textContent = searchTerm 
+                    ? 'Aucune conversation trouvée' 
+                    : 'Aucune conversation';
+                historyList.appendChild(noResultsElement);
+                return;
+            }
+            
+            filteredConversations.forEach(conversation => {
+                const conversationItem = document.createElement('div');
+                conversationItem.className = `w-full flex items-center justify-between px-2 py-2 rounded-md text-sm hover:bg-gray-100 ${
+                    conversation.id === currentConversationId ? 'bg-gray-100' : ''
+                } conversation-item`;
+                
+                // Left side with conversation title
+                const conversationInfo = document.createElement('button');
+                conversationInfo.className = 'flex items-center flex-grow text-left overflow-hidden';
+                conversationInfo.innerHTML = `
+                    <svg class="w-4 h-4 mr-2 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                    </svg>
+                    <span class="truncate">${conversation.title}</span>
+                `;
+                conversationInfo.addEventListener('click', () => loadConversation(conversation.id));
+                
+                // Delete button
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'p-1 ml-2 text-gray-400 hover:text-red-500 rounded-full hover:bg-gray-200 flex-shrink-0 delete-button';
+                deleteButton.innerHTML = `
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                `;
+                deleteButton.setAttribute('aria-label', 'Supprimer la conversation');
+                deleteButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteConversation(conversation.id);
+                });
+                
+                conversationItem.appendChild(conversationInfo);
+                conversationItem.appendChild(deleteButton);
+                historyList.appendChild(conversationItem);
+            });
+        }
+        
+        // Delete a conversation
+        function deleteConversation(conversationId) {
+            // Ask for confirmation
+            if (!confirm('Êtes-vous sûr de vouloir supprimer cette conversation ?')) {
+                return;
+            }
+            
+            // Remove conversation from array
+            const index = conversations.findIndex(c => c.id === conversationId);
+            if (index >= 0) {
+                conversations.splice(index, 1);
+            }
+            
+            // If we deleted the current conversation, create a new one
+            if (conversationId === currentConversationId) {
+                currentConversationId = null;
+                messages = [];
+                messagesContainer.innerHTML = '';
+                welcomeMessageContainer.style.display = 'flex';
+                document.getElementById('currentChatTitleHeader').textContent = "Nouvelle conversation";
+                
+                // Create a new conversation ID for next message
+                currentConversationId = generateConversationId();
+            }
+            
+            // Save to storage
+            saveConversationsToStorage();
+            
+            // Update UI
+            updateConversationHistory();
+        }
+        
+        // Load a conversation from history
+        function loadConversation(conversationId) {
+            // If trying to load the current conversation, do nothing
+            if (currentConversationId === conversationId) return;
+            
+            // Save current conversation if needed
+            if (currentConversationId && messages.length > 0) {
+                const existingConversationIndex = conversations.findIndex(c => c.id === currentConversationId);
+                if (existingConversationIndex >= 0) {
+                    conversations[existingConversationIndex].messages = [...messages];
+                    // Don't update timestamp when saving before switching to avoid changing order
+                } else if (messages.length > 0) {
+                    // If conversation doesn't exist in the array yet but we have messages
+                    const firstUserMessage = messages.find(m => m.isUser)?.content || "Nouvelle conversation";
+                    const title = firstUserMessage.length > 30 ? firstUserMessage.substring(0, 30) + "..." : firstUserMessage;
+                    
+                    conversations.push({
+                        id: currentConversationId,
+                        title: title,
+                        timestamp: new Date(),
+                        messages: [...messages]
+                    });
+                }
+                saveConversationsToStorage();
+            }
+            
+            // Find the conversation to load
+            const conversation = conversations.find(c => c.id === conversationId);
+            if (!conversation) return;
+            
+            // Set as current conversation
+            currentConversationId = conversationId;
+            messages = [...conversation.messages];
+            
+            // Update UI
+            messagesContainer.innerHTML = '';
+            welcomeMessageContainer.style.display = 'none';
+            
+            // Re-add all messages to UI
+            messages.forEach(msg => {
+                addMessageToUI(msg.content, msg.isUser, msg.sources || []);
+            });
+            
+            // Update title
+            document.getElementById('currentChatTitleHeader').textContent = conversation.title;
+            
+            // Update history UI to highlight current conversation
+            updateConversationHistory();
+            
+            // Save current conversation ID to storage
+            saveConversationsToStorage();
+            
+            // On mobile, close sidebar after selection
+            if (window.innerWidth < 768) {
+                sidebar.classList.add('-translate-x-full');
+                mobileSidebarOverlay.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            }
+        }
+        
+        // Function to add message to UI only (without affecting messages array)
+        function addMessageToUI(content, isUser = false, sources = []) {
+            // Hide welcome message if it's the first message
+            if (welcomeMessageContainer && welcomeMessageContainer.style.display !== 'none') {
+                welcomeMessageContainer.style.display = 'none';
+            }
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`;
+            
+            const messageBubble = document.createElement('div');
+            messageBubble.className = `max-w-[85%] rounded-lg p-4 ${
+                isUser 
+                    ? 'bg-chat-interactive text-white' 
+                    : 'bg-gray-100 text-gray-800'
+            }`;
+            
+            // Format the main content
+            const formattedContent = isUser ? content : formatMessageContent(content);
+            
+            const mainContentElement = document.createElement('div');
+            mainContentElement.className = 'message-content';
+            mainContentElement.innerHTML = formattedContent;
+            messageBubble.appendChild(mainContentElement);
+            
+            // Add sources for assistant messages
+            if (!isUser && sources && sources.length > 0) {
+                const sourcesHTML = formatSources(sources);
+                const sourcesElement = document.createElement('div');
+                sourcesElement.innerHTML = sourcesHTML;
+                messageBubble.appendChild(sourcesElement);
+            }
+            
+            messageDiv.appendChild(messageBubble);
+            messagesContainer.appendChild(messageDiv);
+            scrollToBottom();
+        }
+        
+        // Add message with conversation tracking
+        const originalAddMessage = addMessage;
+        addMessage = function(content, isUser = false, sources = []) {
+            // Create new conversation if this is first message
+            if (messages.length === 0 && !currentConversationId) {
+                currentConversationId = generateConversationId();
+            }
+            
+            // Add to messages array
+            messages.push({
+                content: content,
+                isUser: isUser,
+                sources: sources,
+                timestamp: new Date()
+            });
+            
+            // If this is first user message, update conversation title
+            if (isUser && messages.filter(m => m.isUser).length === 1) {
+                const title = content.length > 30 ? content.substring(0, 30) + "..." : content;
+                
+                // Check if element exists before setting textContent
+                const titleElement = document.getElementById('currentChatTitleHeader');
+                if (titleElement) {
+                    titleElement.textContent = title;
+                }
+                
+                // Add to conversations array
+                conversations.push({
+                    id: currentConversationId,
+                    title: title,
+                    timestamp: new Date(),
+                    messages: [...messages]
+                });
+                
+                // Update history UI
+                updateConversationHistory();
+            } else {
+                // Update existing conversation in the array
+                const existingConversationIndex = conversations.findIndex(c => c.id === currentConversationId);
+                if (existingConversationIndex >= 0) {
+                    conversations[existingConversationIndex].messages = [...messages];
+                    // Update timestamp to keep it at the top of the list
+                    conversations[existingConversationIndex].timestamp = new Date();
+                } else if (messages.length > 0) {
+                    // If conversation doesn't exist in the array yet but we have messages
+                    const firstUserMessage = messages.find(m => m.isUser)?.content || "Nouvelle conversation";
+                    const title = firstUserMessage.length > 30 ? firstUserMessage.substring(0, 30) + "..." : firstUserMessage;
+                    
+                    conversations.push({
+                        id: currentConversationId,
+                        title: title,
+                        timestamp: new Date(),
+                        messages: [...messages]
+                    });
+                }
+                
+                // Update history UI
+                updateConversationHistory();
+            }
+            
+            // Save to storage after each message
+            saveConversationsToStorage();
+            
+            // Call UI update function
+            addMessageToUI(content, isUser, sources);
+        };
+        
+        // New chat button event listener
+        document.getElementById('newChatBtn').addEventListener('click', createNewConversation);
+        
+        // Initialize
+        function initializeChat() {
+            // Load conversations from storage
+            loadConversationsFromStorage();
+            
+            // Setup search functionality
+            const searchInput = document.getElementById('searchConversations');
+            searchInput.addEventListener('input', (e) => {
+                updateConversationHistory(e.target.value.trim());
+            });
+            
+            // If there are saved conversations and a current conversation ID
+            if (conversations.length > 0 && currentConversationId) {
+                const currentConversation = conversations.find(c => c.id === currentConversationId);
+                if (currentConversation) {
+                    // Load the current conversation
+                    messages = [...currentConversation.messages];
+                    
+                    // Update UI
+                    messagesContainer.innerHTML = '';
+                    welcomeMessageContainer.style.display = 'none';
+                    
+                    // Re-add all messages to UI
+                    messages.forEach(msg => {
+                        addMessageToUI(msg.content, msg.isUser, msg.sources || []);
+                    });
+                    
+                    // Update title
+                    document.getElementById('currentChatTitleHeader').textContent = currentConversation.title;
+                } else {
+                    // Create a new conversation if the current ID doesn't exist
+                    createNewConversation();
+                }
+            } else {
+                // Create a new conversation if there are no saved conversations
+                createNewConversation();
+            }
+            
+            // Update conversation history UI
+            updateConversationHistory();
+            
+            // Initialize input
+            updateSendButtonState();
+            messageInput.focus();
+        }
+        
+        // Start the application
+        initializeChat();
+    </script>
+</body>
+</html>

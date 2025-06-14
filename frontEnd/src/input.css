@@ -1,0 +1,167 @@
+/* src/input.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    body {
+        /* Using Google Sans from your HTML font import */
+        font-family: 'Google Sans', 'Roboto', sans-serif;
+        @apply text-black antialiased bg-white; /* bg-white matches body in HTML */
+    }
+    /* Custom scrollbar styles (moved from HTML) */
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        @apply bg-gray-400 rounded-[3px]; /* Using Tailwind color for consistency */
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        @apply bg-gray-500;
+    }
+}
+
+@layer components {
+  /* Form elements */
+  .form-input {
+    @apply w-full px-4 py-3 rounded-lg border
+           border-[theme(colors.signup-input-border)]
+           focus:outline-none focus:ring-2 focus:ring-[theme(colors.signup-primary-focus-ring)] focus:border-transparent
+           bg-[theme(colors.signup-input-bg)]
+           placeholder:text-[theme(colors.signup-input-placeholder)]
+           text-[theme(colors.signup-input-text)]
+           transition duration-200;
+  }
+
+  .invalid {
+    @apply border-[theme(colors.signup-error)];
+  }
+  .invalid:focus {
+    @apply ring-2 ring-[theme(colors.signup-error-focus-ring)] border-[theme(colors.signup-error)];
+  }
+
+  .error-message {
+    @apply text-[theme(colors.signup-error)] text-xs mt-1 transition-opacity duration-200 ease-in-out opacity-0 h-0 overflow-hidden block; min-height: 0;
+  }
+  .error-message.visible {
+    @apply opacity-100 h-auto; min-height: 1.2em;
+  }
+
+  /* Button styles */
+  .btn {
+    @apply py-3 px-6 rounded-lg text-base font-medium cursor-pointer transition duration-300 ease-in-out transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+  .btn-secondary {
+    @apply bg-white text-gray-700 border border-[theme(colors.btn-secondary-border)] hover:bg-gray-50 focus:ring-gray-300 w-full sm:w-auto shadow-none;
+  }
+  .btn-primary {
+    @apply bg-[theme(colors.btn-primary-bg)] text-[theme(colors.btn-text-light)] hover:bg-[theme(colors.btn-primary-bg-hover)] focus:ring-[theme(colors.btn-primary-focus-ring)] w-full;
+  }
+
+  /* Sidebar styles */
+  #sidebar.is-collapsed-desktop { @apply w-[72px]; }
+  #sidebar.is-expanded-desktop { @apply w-[288px]; }
+
+  #sidebar.is-collapsed-desktop .sidebar-text,
+  #sidebar.is-collapsed-desktop #sidebarOpenTitle,
+  #sidebar.is-collapsed-desktop #userProfileContainer #userInfo,
+  #sidebar.is-collapsed-desktop #searchConversationsContainer,
+  #sidebar.is-collapsed-desktop #historyToggleBtn .sidebar-text,
+  #sidebar.is-collapsed-desktop #userAccountBtn {
+    @apply hidden;
+  }
+
+  #sidebar.is-collapsed-desktop #newChatBtn,
+  #sidebar.is-collapsed-desktop .history-item,
+  #sidebar.is-collapsed-desktop #historyToggleBtn,
+  #sidebar.is-collapsed-desktop #userProfileContainer {
+    @apply justify-center px-0;
+  }
+  #sidebar.is-collapsed-desktop #newChatBtn svg { @apply mr-0; }
+
+  /* Mobile sidebar states */
+  #sidebar.is-mobile-hidden { @apply -translate-x-full; }
+  #sidebar.is-mobile-visible { @apply translate-x-0 w-[288px]; }
+
+  #sidebar.is-mobile-visible .sidebar-text,
+  #sidebar.is-mobile-visible #sidebarOpenTitle,
+  #sidebar.is-mobile-visible #userProfileContainer #userInfo {
+    @apply block;
+  }
+
+  /* Main chat area margin adjustments */
+  #mainChatArea.desktop-sidebar-expanded { @apply ml-[288px]; }
+  #mainChatArea.desktop-sidebar-collapsed { @apply ml-[72px]; }
+  @media (max-width: 767px) {
+    #mainChatArea.desktop-sidebar-expanded,
+    #mainChatArea.desktop-sidebar-collapsed {
+      @apply ml-0 !important;
+    }
+  }
+
+  /* History section collapse/expand */
+  #historySection.collapsed {
+    @apply max-h-0 opacity-0 pointer-events-none overflow-hidden mt-0 pb-0 !important;
+  }
+  #historySection {
+    @apply transition-[max-height_opacity_margin-top_padding-bottom] duration-300 ease-out overflow-hidden;
+  }
+
+  /* Message bubble styles */
+  .message-bubble-user {
+    @apply bg-gemini-user-bubble-bg text-gemini-user-bubble-text;
+  }
+  .message-bubble-bot {
+    @apply bg-gemini-bot-bubble-bg text-gemini-bot-bubble-text;
+  }
+
+  /* History item selected state */
+  .history-item.selected {
+    @apply bg-gemini-history-selected-bg text-gemini-history-selected-text font-medium;
+  }
+  .history-item.selected svg {
+    @apply text-gemini-history-selected-text;
+  }
+
+  /* Icon button helper */
+  .icon-btn svg {
+    pointer-events: none;
+  }
+
+  /* Typing indicator animation */
+  @keyframes bounce {
+    0%, 100% {
+      transform: translateY(0);
+      opacity: 0.6;
+    }
+    50% {
+      transform: translateY(-4px);
+      opacity: 1;
+    }
+  }
+
+  .typing-dot {
+    display: inline-block;
+    font-size: 1.2em;
+    animation: bounce 1.2s infinite;
+  }
+
+  /* Utility class for hidden elements */
+  .force-hidden { /* Use if Tailwind's .hidden is not specific enough */
+    display: none !important;
+  }
+
+  /* History item container */
+  .history-item-container {
+    /* The 'group' class will be applied via JS to this container */
+  }
+
+  /* Ensure sidebar-text within history item link can shrink if needed */
+  .history-item .sidebar-text {
+    min-width: 0; /* Allows text to truncate properly with flex-1 */
+  }
+}

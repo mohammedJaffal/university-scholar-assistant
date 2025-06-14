@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FSBM Scholar Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./dist/style.css">
+</head>
+<body class="bg-page-bg text-gray-900 leading-relaxed flex justify-center items-center min-h-screen overflow-hidden relative font-poppins">
+    <div class="page-container flex flex-col lg:flex-row w-full max-w-6xl min-h-[70vh] relative z-10">
+        <div class="absolute rounded-full bg-decor-bg z-0 top-[-50px] left-[-50px] w-[200px] h-[200px]"></div>
+        <div class="absolute rounded-full bg-decor-bg opacity-70 z-0 top-[10%] right-[5%] w-[80px] h-[80px]"></div>
+        <div class="absolute rounded-full bg-decor-bg z-0 bottom-[15%] left-[30%] w-[120px] h-[120px]"></div>
+        <div class="absolute rounded-full bg-decor-bg opacity-80 z-0 top-[15%] left-[10%] w-[50px] h-[50px]"></div>
+
+        <div class="left-panel flex-1 lg:flex-[1.1] p-10 lg:px-16 lg:py-10 flex flex-col justify-center relative z-10 order-1 text-center lg:text-left">
+            <h1 class="text-3xl lg:text-[2.2em] text-text-heading mb-10 font-semibold leading-tight">Welcome to FSBM Scholar Assistant Your smart assistant at FSBM</h1>
+            <div class="illustration-section relative text-center mb-10 w-[250px] mx-auto lg:mx-0 lg:ml-auto lg:mr-auto">
+                <img src="img.png" alt="Robot lisant un livre" class="max-w-full h-auto block mx-auto">
+            </div>
+            <div class="registration-buttons flex flex-col sm:flex-row justify-center gap-5 mt-5 lg:mt-5 w-full max-w-xs mx-auto lg:max-w-none lg:w-auto lg:mx-0">
+                 <button class="btn btn-secondary" id="registerStudentBtn">Inscription Étudiant</button>
+                 <button class="btn btn-secondary" id="registerProfBtn">Inscription Professeur</button>
+            </div>
+        </div>
+
+        <div class="right-panel flex-1 lg:flex-[0.9] p-10 lg:px-16 lg:py-10 flex flex-col justify-center items-center relative z-10 order-2">
+            <div class="login-form-container bg-white p-10 rounded-xl shadow-lg w-full max-w-md text-center">
+                <form id="loginForm">
+                    <div class="form-group mb-6 text-left">
+                        <label for="email" class="block mb-2 text-gray-800 font-medium text-sm">Email</label>
+                        <input type="email" id="email" name="email" required placeholder="Entrez votre email"
+                               class="w-full py-3 px-4 border border-gray-300 rounded-md text-base text-gray-900 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-input-focus-border/50 focus:border-input-focus-border placeholder-gray-500">
+                    </div>
+                    <div class="form-group mb-6 text-left">
+                        <label for="password" class="block mb-2 text-gray-800 font-medium text-sm">Mot de passe</label>
+                        <input type="password" id="password" name="password" required placeholder="Entrez votre mot de passe"
+                               class="w-full py-3 px-4 border border-gray-300 rounded-md text-base text-gray-900 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-input-focus-border/50 focus:border-input-focus-border placeholder-gray-500">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-full mt-3 mb-5">Se connecter</button>
+                    <a href="#" class="forgot-password inline-block text-text-link-forgot no-underline text-sm transition duration-300 ease-in-out hover:text-text-heading hover:underline">Mot de passe oublié?</a>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="./dist/main.js"></script>
+</body>
+</html>

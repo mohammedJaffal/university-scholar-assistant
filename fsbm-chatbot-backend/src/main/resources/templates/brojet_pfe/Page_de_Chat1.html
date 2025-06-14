@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Page de Chat</title>
+    <link href="./dist/style.css" rel="stylesheet" />
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <header class="bg-white p-4 shadow">
+        <h1 class="text-xl font-semibold text-gray-700">Test Header</h1>
+    </header>
+
+    <main class="p-4">
+        <p id="testParagraph" class="text-blue-600">Contenu de test principal.</p>
+    </main>
+
+    <footer class="bg-white p-4 shadow-up">
+        <p class="text-sm text-gray-500">Test Footer</p>
+    </footer>
+
+    <script type="module">
+        console.log("Simple HTML test script loaded.");
+        const testP = document.getElementById('testParagraph');
+        if (testP) {
+            testP.textContent = "JavaScript a modifié ce texte !";
+        } else {
+            console.error("Element with ID 'testParagraph' not found by simple script.");
+        }
+    </script>
+</body>
+</html>

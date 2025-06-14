@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vérification E-mail</title>
+   
+    <link href="./dist/style.css" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Optional: Ensure icon styles if needed, but not used here */
+        /* .icon { ... } */
+    </style>
+</head>
+
+<body class="bg-verify-bg font-poppins flex items-center justify-center min-h-screen">
+   
+    <div class="text-center max-w-md w-full px-6">
+        
+        <h1 class="text-3xl font-bold mb-4 text-verify-title">
+            Vérifiez votre e-mail
+        </h1>
+
+        
+        <p class="text-base mb-8 text-verify-text leading-relaxed">
+            Vous y êtes presque! Nous avons envoyé un email à <strong id="userEmailPlaceholder" class="font-medium text-gray-700">[adresse e-mail enregistrée]</strong>.
+            <br>
+            Entrez le code que vous avez reçu dans l'input au dessous pour finaliser Votre inscription. Si vous ne trouvez pas l'email, vérifiez votre dossier spam.
+            
+        </p>
+
+        
+        <form id="verifyForm" class="space-y-5">
+            <div class="form-group relative">
+                 
+                <input
+                    type="text"
+                    id="verificationCode"
+                    name="verificationCode"
+                    placeholder="Code de vérification"
+                    required
+                    aria-required="true"
+                    maxlength="6"
+                    inputmode="numeric"
+                    pattern="[0-9]{6}"
+                    class="w-full px-4 py-3 border border-verify-input-border rounded-verify-input bg-verify-input-bg text-center text-lg tracking-widest placeholder-verify-input-placeholder text-gray-700 focus:outline-none focus:ring-2 focus:ring-verify-button-bg/50 focus:border-transparent transition duration-200"
+                    aria-describedby="verificationCode-error"
+                />
+                 
+                 <span class="error-message text-left block" id="verificationCode-error" aria-live="polite"></span> 
+            </div>
+
+           
+            <button
+                type="submit"
+                id="validateBtn"
+                class="w-full bg-verify-button-bg text-white py-3 rounded-verify-button font-semibold hover:bg-verify-button-hover transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-verify-button-bg/50">
+                Valider
+            </button>
+        </form>
+
+        
+        <div class="mt-6">
+            <button
+                type="button"
+                id="resendCodeBtn"
+                class="text-sm text-verify-resend-link hover:text-verify-resend-link-hover hover:underline focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                Renvoyer le code
+            </button>
+        </div>
+    </div>
+
+    
+    <script type="module" src="./dist/VerifyEmail.js"></script>
+</body>
+</html>

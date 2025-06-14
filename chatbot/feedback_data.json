@@ -1,0 +1,53 @@
+{
+  "feedback_entries": [
+    {
+      "message_id": "496427d2-4ce7-468f-8af1-b5cd64b120a6",
+      "query": "definition en bref de DBA",
+      "response": "Je ne trouve pas d'information sur ce sujet dans les documents du cours. Specific terms like 'definition' not found in course materials. Vous pourriez essayer de poser une de ces questions à la place: - syllabus definition en bref de DBA - cours definition en bref de DBA - exam definition en bref de DBA Consultez votre professeur ou les ressources officielles du cours pour plus d'informations. ",
+      "feedback_type": "negative",
+      "timestamp": "2025-04-09T14:40:17.625736",
+      "doc_count": 5,
+      "doc_sources": [
+        "docs\\SMI\\S6\\DBA\\2- Architecture Multitenant.pdf",
+        "docs\\SMI\\S6\\Java\\-_-  JAVA_chapitre2_ElementsDeBase_Pr-Belangour.pdf",
+        "docs\\SMI\\S6\\PLSQL\\14- Cours_PL-SQL...pdf"
+      ],
+      "id": "27c705a8-1c0d-42ef-8e8a-81804ad4a3e4"
+    },
+    {
+      "message_id": "2e7aea95-9495-4885-b7f2-1e15d2e49fcd",
+      "query": "definition en bref de DBA",
+      "response": "Je ne trouve pas d'information sur ce sujet dans les documents du cours. Specific terms like 'definition' not found in course materials. Vous pourriez essayer de poser une de ces questions à la place: - syllabus definition en bref de DBA - cours definition en bref de DBA - exam definition en bref de DBA Consultez votre professeur ou les ressources officielles du cours pour plus d'informations. ",
+      "feedback_type": "negative",
+      "timestamp": "2025-04-09T14:40:30.640075",
+      "doc_count": 5,
+      "doc_sources": [
+        "docs\\SMI\\S6\\DBA\\2- Architecture Multitenant.pdf",
+        "docs\\SMI\\S6\\Java\\-_-  JAVA_chapitre2_ElementsDeBase_Pr-Belangour.pdf",
+        "docs\\SMI\\S6\\PLSQL\\14- Cours_PL-SQL...pdf"
+      ],
+      "id": "f771f98e-7cda-43e9-8c37-4dffa117d3b4"
+    },
+    {
+      "message_id": "9bb06c39-adc8-4ed7-8452-2d67abb23655",
+      "query": "definition en bref de DBA",
+      "response": "Je ne trouve pas d'information sur ce sujet dans les documents du cours. Specific terms like 'definition' not found in course materials. Vous pourriez essayer de poser une de ces questions à la place: - syllabus definition en bref de DBA - cours definition en bref de DBA - exam definition en bref de DBA Consultez votre professeur ou les ressources officielles du cours pour plus d'informations. ",
+      "feedback_type": "negative",
+      "timestamp": "2025-04-09T14:40:45.886630",
+      "doc_count": 5,
+      "doc_sources": [
+        "docs\\SMI\\S6\\DBA\\2- Architecture Multitenant.pdf",
+        "docs\\SMI\\S6\\Java\\-_-  JAVA_chapitre2_ElementsDeBase_Pr-Belangour.pdf",
+        "docs\\SMI\\S6\\PLSQL\\14- Cours_PL-SQL...pdf"
+      ],
+      "id": "de6c19ac-494d-47ab-9096-efe269a5c471"
+    }
+  ],
+  "improvement_suggestions": [],
+  "knowledge_gaps": [],
+  "metrics": {
+    "positive_count": 0,
+    "negative_count": 3,
+    "total_count": 3
+  }
+}

@@ -1,0 +1,16 @@
+# Ignore Python virtual environments
+.venv/
+env/
+venv/
+.src/
+.vscode/
+.cursor/
+
+node_modules/
+
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+
+# Logs
+*.log

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inscription Professeur</title>
+    <link href="./dist/style.css" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body class="bg-signup-bg font-sans text-signup-input-text flex justify-center items-center min-h-screen p-5">
+    <div class="bg-signup-card-bg rounded-lg shadow-lg overflow-hidden p-8 w-2/5 min-h-screen flex flex-col">
+      <header class="px-6 py-4 flex justify-between items-center flex-shrink-0">
+        <button type="button" class="menu-button bg-transparent border-none text-2xl text-signup-primary cursor-pointer p-1 leading-none transition-colors hover:text-signup-primary-darker" aria-label="Menu principal">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-10 6h10" /> </svg>
+        </button>
+         <a href="./index.html" class="text-sm text-gray-600 hover:text-gray-800 hover:underline">Retour</a>
+      </header>
+
+       <h1 class="text-signup-primary text-3xl font-semibold text-center mb-8 leading-tight flex-shrink-0">
+            Inscription Professeur
+        </h1>
+
+        <form id="registerForm" novalidate class="flex flex-col flex-grow">
+            <div class="space-y-5 flex-grow">
+                <div class="form-group relative">
+                    <input type="text" placeholder="Nom" id="nom" class="form-input" required aria-required="true"/>
+                    <span class="error-message" id="nom-error" aria-live="polite"></span>
+                </div>
+                <div class="form-group relative">
+                    <input type="text" placeholder="Prénom" id="prenom" class="form-input" required aria-required="true"/>
+                    <span class="error-message" id="prenom-error" aria-live="polite"></span>
+                </div>
+                <div class="form-group relative">
+                    <input type="email" placeholder="Email professionnel" id="email" class="form-input" required aria-required="true"/>
+                    <span class="error-message" id="email-error" aria-live="polite"></span>
+                </div>
+                <div class="form-group relative">
+                    <input type="text" placeholder="Module(s) enseigné(s)" id="modules" class="form-input" required aria-required="true"/>
+                    <span class="error-message" id="modules-error" aria-live="polite"></span>
+               </div>
+                <div class="form-group relative">
+                    <input type="password" placeholder="Mot de passe" id="password" class="form-input" required aria-required="true" minlength="8"/>
+                    <span class="error-message" id="password-error" aria-live="polite"></span>
+                </div>
+                <div class="form-group relative">
+                    <input type="password" placeholder="Confirmer le mot de passe" id="confirmPassword" class="form-input" required aria-required="true"/>
+                    <span class="error-message" id="confirmPassword-error" aria-live="polite"></span>
+                </div><br>
+            </div>
+            <button type="submit" class="w-full px-4 py-4 mt-auto bg-signup-primary text-btn-text-light border-none rounded-lg text-base font-medium cursor-pointer transition duration-200 ease-in-out hover:bg-signup-primary-darker focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-signup-primary/50 active:scale-[0.98] flex-shrink-0">
+                Créer un compte
+            </button>
+        </form>
+      </div>
+    <script type="module" src="./dist/ProfessorRegistration.js"></script>
+  </body>
+</html>
